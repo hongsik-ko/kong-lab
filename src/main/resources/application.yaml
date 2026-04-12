@@ -1,3 +1,19 @@
 spring:
   application:
     name: konglab
+  datasource:
+    url: jdbc:postgresql://localhost:5432/kong_lab
+    username: ai_lab
+    password: qwe123
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
