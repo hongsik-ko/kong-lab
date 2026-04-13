@@ -82,4 +82,25 @@ public class BasicEntity {
         }
     }
 
+    public void setCreatedAtNow () {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public void setModifiedAtNow () {
+        this.modifiedAt = LocalDateTime.now();
+    }
+
+    public void setCreateByTestUser () {
+        this.createdBy = 1L;
+    }
+    public void setModifiedByTestUser () {
+        this.modifiedBy = 1L;
+    }
+
+    public void setInitData () {
+        this.setCreatedAtNow();
+        this.setModifiedAtNow();
+        this.setCreateByTestUser();
+        this.setModifiedByTestUser();
+    }
 }

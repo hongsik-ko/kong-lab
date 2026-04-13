@@ -15,7 +15,7 @@ public class SessionUserProvider {
     public SessionUserContext getCurrentUser() {
         return SessionUserContext.builder()
                 .loginUserId(1L)
-                .userName("testUser")
+                .userName("testUserz")
                 .userInfoMap(new HashMap<>())
                 .build();
     }
