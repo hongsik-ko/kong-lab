@@ -14,11 +14,16 @@ import java.util.Map;
 @Builder
 @Getter
 public class SessionUserContext {
+
+    // 현재 로그인한 사용자 ID
     private Long loginUserId;
+
+    // 현재 로그인한 사용자 이름
     private String userName;
 
     /**
      * 확장용 유저 정보
+     *  - 화면단과 합의한 캐시 유저 정보
      * (권한, 조직, 캐시 데이터 등)
      */
     private Map<String, Object> userInfoMap;
