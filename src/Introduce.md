@@ -198,3 +198,14 @@ kong_lab
 - 빠르게 만들고 → 점진적으로 개선
 - AI를 활용한 생산성 극대화
 - 실무형 구조 유지
+
+---
+
+# Ground Rules
+
+## DB Naming Rule
+
+- table: 단수형 snake_case
+- column: snake_case
+- pk: {entity}_id
+- fk: {entity}_id

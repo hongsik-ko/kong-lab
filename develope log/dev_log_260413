@@ -1,0 +1,137 @@
+# 📒 Kong Lab (공렙) 개발 로그
+
+---
+
+## 📅 2026-04-12 ~ 2026-04-13
+
+### ✅ 프로젝트 방향 합의
+- 주식 "추천" 서비스 ❌
+- "이슈 기반 종목 분석 서비스" ⭕
+
+---
+
+### ✅ 기술 스택
+- Backend: Spring Boot + JPA
+- DB: PostgreSQL
+- AI: ChatGPT + Cursor
+
+---
+
+### ✅ 엔티티 설계 규칙
+- 공통 엔티티: `BasicEntity`
+- 개별 PK 명시:
+  - stockId
+  - exchangeRateId
+  - (공통 id 사용 ❌)
+
+---
+
+### ✅ BasicEntity 구성
+- createdAt (UTC)
+- createdBy
+- modifiedAt (UTC)
+- modifiedBy
+- recordStatus (enum, length=1)
+
+---
+
+### ✅ RecordStatus 정의
+- N: Normal
+- D: Deleted
+- H: Hidden
+- E: Error
+
+---
+
+### ✅ Audit 전략
+- JPA Auditing 사용
+- @CreatedDate / @LastModifiedDate
+- @CreatedBy / @LastModifiedBy
+- AuditorAware로 사용자 주입
+
+---
+
+### ✅ 임시 로그인 구조
+- SessionUserContext
+- SessionUserProvider
+- userId = 1L 하드코딩
+
+---
+
+### ✅ 시간 기준
+- DB 저장: UTC
+
+---
+
+### ✅ 테이블 네이밍 규칙
+- 단수형 사용
+- snake_case
+- 예:
+  - stock
+  - exchange_rate
+
+---
+
+### ✅ 금액 / 통화 설계
+- currentPrice: BigDecimal
+- exchangeRate: BigDecimal
+- currency: String (KRW, USD 등)
+
+---
+
+### ✅ 환율 설계
+- ExchangeRate 별도 테이블
+- Stock과 직접 연관 ❌
+- Service에서 조회 후 계산
+
+---
+
+### ✅ ExchangeRate 구조
+- baseCurrency
+- targetCurrency
+- rateDate
+- exchangeRate
+- unique: (baseCurrency, targetCurrency, rateDate)
+
+---
+
+### ✅ DataInitializer 전략
+- 서버 시작 시 샘플 데이터 삽입
+- Stock + ExchangeRate 초기 데이터 구성
+
+---
+
+### ✅ 개발 완료 사항
+
+#### 1️⃣ 공통 구조
+- BasicEntity 구현
+- RecordStatus enum 구현
+- AuditorAware 구현
+- SessionUserProvider 구현
+
+#### 2️⃣ 도메인
+- Stock 엔티티 구현
+- ExchangeRate 엔티티 구현
+
+#### 3️⃣ Repository
+- StockRepository
+- ExchangeRateRepository
+
+#### 4️⃣ 초기 데이터
+- Stock 샘플 4개
+- ExchangeRate 샘플 2개
+
+---
+
+## 🚀 다음 단계
+- News 엔티티 설계
+- Stock ↔ News 연관관계
+- 이슈 분석 구조 구현
+
+---
+
+## 💡 설계 철학
+- 저장 = 숫자 / 표현 = 문자열
+- Audit은 자동 처리
+- 엔티티는 의미 중심 설계
+- 확장 가능한 구조 유지

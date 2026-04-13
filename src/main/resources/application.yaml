@@ -6,7 +6,6 @@ spring:
     username: ai_lab
     password: qwe123
     driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -14,6 +13,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          time_zone: UTC
+  jackson:
+    time-zone: UTC
 
 server:
   port: 8080

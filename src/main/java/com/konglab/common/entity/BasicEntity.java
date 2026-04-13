@@ -3,7 +3,9 @@ package com.konglab.common.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.Comment;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -18,8 +20,8 @@ import java.time.LocalDateTime;
  * - 레코드 상태 관리
  */
 @Getter
-@MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
+@MappedSuperclass // 공통 필드만 상속, 테이블은 생성하지 않음
+@EntityListeners(AuditingEntityListener.class) // JPA Audit 동작
 public class BasicEntity {
     /**
      * 생성일시 (UTC 기준)
@@ -32,7 +34,9 @@ public class BasicEntity {
 
     /**
      * 생성자 (로그인 사용자 ID)
+     * insert시 현재 로그인 사용자 ID 자동 입력
      */
+    @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
     @Comment("생성자 ID")
     private Long createdBy;
@@ -48,14 +52,16 @@ public class BasicEntity {
 
     /**
      * 수정자 (로그인 사용자 ID)
+     * update 시 현재 로그인 사용자 ID 자동 입력
      */
+    @LastModifiedBy
     @Column(name = "modified_by", nullable = false)
     @Comment("수정자 ID")
     private Long modifiedBy;
 
     /**
      * 레코드 상태
-     * N: 정상, D: 삭제, H: 숨김, A: 보관
+     * N: 정상, D: 삭제, H: 숨김, A: 에러
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "record_status", nullable = false, length = 1)
@@ -68,39 +74,32 @@ public class BasicEntity {
     protected void changeStatus(RecordStatus status) {
         this.recordStatus = status;
     }
+    /**
+     * 레코드 삭제 상태 변경
+     */
+    public void markDeleted() {
+        this.recordStatus = RecordStatus.D;
+    }
 
     /**
-     * 감사 정보 업데이트
-     * (서비스 레이어에서 로그인 사용자 ID로 호출)
+     * 레코드 숨김 상태 변경
      */
-    public void updateAudit(Long loginUserId) {
-        this.modifiedBy = loginUserId;
-
-        // 최초 생성 시 createdBy 세팅
-        if (this.createdBy == null) {
-            this.createdBy = loginUserId;
-        }
+    public void markHidden() {
+        this.recordStatus = RecordStatus.H;
     }
 
-    public void setCreatedAtNow () {
-        this.createdAt = LocalDateTime.now();
+    /**
+     * 레코드 정상 상태 변경
+     */
+    public void markNormal() {
+        this.recordStatus = RecordStatus.N;
     }
 
-    public void setModifiedAtNow () {
-        this.modifiedAt = LocalDateTime.now();
+    /**
+     * 레코드 에러 상태 변경
+     */
+    public void markError() {
+        this.recordStatus = RecordStatus.E;
     }
 
-    public void setCreateByTestUser () {
-        this.createdBy = 1L;
-    }
-    public void setModifiedByTestUser () {
-        this.modifiedBy = 1L;
-    }
-
-    public void setInitData () {
-        this.setCreatedAtNow();
-        this.setModifiedAtNow();
-        this.setCreateByTestUser();
-        this.setModifiedByTestUser();
-    }
 }
