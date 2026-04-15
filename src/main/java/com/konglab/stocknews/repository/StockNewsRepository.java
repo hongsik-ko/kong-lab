@@ -26,4 +26,10 @@ public interface StockNewsRepository extends JpaRepository<StockNews, Long> {
     * 종목별 연결 개수 조회
     * */
     long countByStock_StockId(Long stockId);
+
+    /*
+    *
+    * 종목 기준 뉴스 조회 (뉴스의 최신순 정렬)
+    * */
+    List<StockNews> findByStock_StockIdOrderByNews_PublishedAtDesc(Long stockId);
 }
