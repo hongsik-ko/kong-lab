@@ -1,5 +1,6 @@
 package com.konglab.stocknews.entity;
 
+import com.konglab.common.entity.BasicEntity;
 import com.konglab.common.entity.PrimaryType;
 import com.konglab.news.entity.News;
 import com.konglab.stock.entity.Stock;
@@ -30,7 +31,7 @@ import java.math.BigDecimal;
 )
 @Getter // getter 자동 생성
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 기본 생성자 보호
-public class StockNews {
+public class StockNews extends BasicEntity {
     @Id // PK
     @GeneratedValue(strategy = GenerationType.IDENTITY) // DB auto increment
     @Column(name = "stock_news_id")

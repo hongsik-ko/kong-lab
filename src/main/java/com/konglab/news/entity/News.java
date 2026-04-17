@@ -21,7 +21,7 @@ import org.hibernate.annotations.Comment;
 @Table(name = "news")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class News {
+public class News extends BasicEntity{
     @Id // PK
     @GeneratedValue(strategy = GenerationType.IDENTITY) // DB auto increment
     @Column(name = "news_id")

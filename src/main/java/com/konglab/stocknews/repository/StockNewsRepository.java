@@ -1,7 +1,9 @@
 package com.konglab.stocknews.repository;
 
+import com.konglab.issue.dto.StockIssueRawDto;
 import com.konglab.stocknews.entity.StockNews;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -32,4 +34,18 @@ public interface StockNewsRepository extends JpaRepository<StockNews, Long> {
     * 종목 기준 뉴스 조회 (뉴스의 최신순 정렬)
     * */
     List<StockNews> findByStock_StockIdOrderByNews_PublishedAtDesc(Long stockId);
+    /*
+    *
+    * 종목별 이슈 점수 계산용 집계 조회
+    * */
+    @Query("""
+            select sn
+            from StockNews sn 
+            join fetch sn.stock s
+            join fetch sn.news n
+            where s.recordStatus = com.konglab.common.entity.RecordStatus.N
+                and n.recordStatus = com.konglab.common.entity.RecordStatus.N
+                and sn.recordStatus = com.konglab.common.entity.RecordStatus.N         
+            """)
+    List<StockNews> findAllActiveForIssue();
 }
