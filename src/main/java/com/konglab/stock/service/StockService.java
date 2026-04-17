@@ -13,6 +13,7 @@ public class StockService {
     private final StockRepository stockRepository;
 
     public List<Stock> getAllStocks() {
+
         return stockRepository.findAll();
     }
 }

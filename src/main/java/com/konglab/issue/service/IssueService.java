@@ -1,6 +1,8 @@
 package com.konglab.issue.service;
 
 import com.konglab.common.entity.PrimaryType;
+import com.konglab.common.exception.BusinessException;
+import com.konglab.common.exception.ErrorCode;
 import com.konglab.issue.calculator.IssueScoreCalculator;
 import com.konglab.issue.dto.StockIssueRawDto;
 import com.konglab.issue.dto.TodayIssueResponseDto;
@@ -28,6 +30,10 @@ public class IssueService {
     public List<TodayIssueResponseDto> getTodayIssues() {
         List<StockNews> stockNewsList = stockNewsRepository.findAllActiveForIssue();
 
+        if (stockNewsList.isEmpty()) {
+            throw new BusinessException(ErrorCode.STOCK_NOT_FOUND);
+        }
+
         Map<Long, List<StockNews>> grouped = stockNewsList.stream()
                 .collect(Collectors.groupingBy(sn -> sn.getStock().getStockId()));
 
@@ -44,6 +50,9 @@ public class IssueService {
         return primaryType.name().equals(checker);
     }
     public StockIssueRawDto toRawDto(List<StockNews> stockNewsList) {
+        if (stockNewsList.isEmpty() || stockNewsList.get(0) == null || stockNewsList.get(0).getStock() == null) {
+            throw new BusinessException(ErrorCode.STOCK_NOT_FOUND);
+        }
         Stock stock = stockNewsList.get(0).getStock();
 
         long newsCount = stockNewsList.size();

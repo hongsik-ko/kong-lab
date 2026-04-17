@@ -1,5 +1,7 @@
 package com.konglab.news.service;
 
+import com.konglab.common.exception.BusinessException;
+import com.konglab.common.exception.ErrorCode;
 import com.konglab.news.dto.StockNewsResponseDto;
 import com.konglab.stocknews.entity.StockNews;
 import com.konglab.stocknews.repository.StockNewsRepository;
@@ -22,7 +24,9 @@ public class NewsService {
 
         List<StockNews> stockNewsList =
                 stockNewsRepository.findByStock_StockIdOrderByNews_PublishedAtDesc(stockId);
-
+        if (stockNewsList == null || stockNewsList.isEmpty()) {
+            throw new BusinessException(ErrorCode.STOCK_NOT_FOUND);
+        }
         return stockNewsList.stream()
                 .map(StockNewsResponseDto::from)
                 .collect(Collectors.toList());
