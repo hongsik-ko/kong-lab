@@ -1,5 +1,6 @@
 package com.konglab.stock.controller;
 
+import com.konglab.common.response.ApiResponse;
 import com.konglab.news.dto.StockNewsResponseDto;
 import com.konglab.news.service.NewsService;
 import com.konglab.stock.service.StockService;
@@ -19,14 +20,14 @@ public class StockController {
     private final StockService stockService;
     private final NewsService newsService;
 
-    @GetMapping // GET /api/stock
-    public Iterable<Stock> getAllStocks() {
-        return stockService.getAllStocks();
+    @GetMapping
+    public ApiResponse<List<Stock>> getAllStocks() {
+        return ApiResponse.success(stockService.getAllStocks());
     }
 
     @GetMapping("/{stockId}/news")
-    public List<StockNewsResponseDto> getStockNews(@PathVariable Long stockId) {
-        return newsService.getNewsByStock(stockId);
+    public ApiResponse<List<StockNewsResponseDto>> getStockNews(@PathVariable Long stockId) {
+        return ApiResponse.success(newsService.getNewsByStock(stockId));
     }
 
 }

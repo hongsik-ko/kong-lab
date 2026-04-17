@@ -21,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class IssueController {
     private final IssueService issueService;
-
+ 
     @GetMapping("/today")
     public ApiResponse<List<TodayIssueResponseDto>> getTodayIssues() {
         return ApiResponse.success(issueService.getTodayIssues());

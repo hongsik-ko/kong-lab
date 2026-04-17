@@ -20,7 +20,13 @@ public record StockIssueRawDto(
         Long newsCount,
         Long positivePrimaryCount,
         Long negativePrimaryCount,
-        BigDecimal averageRelevanceScore
+        BigDecimal averageRelevanceScore,
+
+        String positivePrimaryTitle,
+        String positivePrimaryUrl,
+
+        String negativePrimaryTitle,
+        String negativePrimaryUrl
 
 ) {
 

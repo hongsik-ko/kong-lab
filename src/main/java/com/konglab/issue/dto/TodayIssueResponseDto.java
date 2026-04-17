@@ -20,6 +20,12 @@ public record TodayIssueResponseDto(
         Long negativePrimaryCount,
         BigDecimal averageRelevanceScore,
 
+        String positivePrimaryTitle,
+        String positivePrimaryUrl,
+
+        String negativePrimaryTitle,
+        String negativePrimaryUrl,
+
         BigDecimal issueScore
 ) {
 }

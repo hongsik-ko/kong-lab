@@ -14,10 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,8 +22,7 @@ import java.util.stream.Collectors;
 public class IssueService {
     private final StockNewsRepository stockNewsRepository;
     private final IssueScoreCalculator issueScoreCalculator;
-    final String primeTypeP = PrimaryType.P.name();
-    final String primeTypeN = PrimaryType.N.name();
+
     public List<TodayIssueResponseDto> getTodayIssues() {
         List<StockNews> stockNewsList = stockNewsRepository.findAllActiveForIssue();
 
@@ -43,42 +39,46 @@ public class IssueService {
                 .sorted(Comparator.comparing(TodayIssueResponseDto::issueScore).reversed())
                 .toList();
     }
-    public boolean checkPrimaryType(PrimaryType primaryType, String checker) {
-        if (primaryType == null || checker == null) return false;
-        if (checker.isEmpty()) return false;
-        if (!List.of(primeTypeP, primeTypeN).contains(checker)) return false;
-        return primaryType.name().equals(checker);
-    }
-    public StockIssueRawDto toRawDto(List<StockNews> stockNewsList) {
-        if (stockNewsList.isEmpty() || stockNewsList.get(0) == null || stockNewsList.get(0).getStock() == null) {
+    /**
+     * StockNews 리스트를 이슈 계산용 DTO로 변환
+     */
+    private StockIssueRawDto toRawDto(List<StockNews> list) {
+        if (list.isEmpty() || list.get(0) == null || list.get(0).getStock() == null) {
             throw new BusinessException(ErrorCode.STOCK_NOT_FOUND);
         }
-        Stock stock = stockNewsList.get(0).getStock();
+        Stock stock = list.get(0).getStock();
 
-        long newsCount = stockNewsList.size();
-        long positivePrimaryCount = stockNewsList.stream()
-                .filter(sn -> checkPrimaryType(sn.getPrimaryType(), primeTypeP))
-                .count();
-        long negativePrimaryCount = stockNewsList.stream()
-                .filter(sn -> checkPrimaryType(sn.getPrimaryType(), primeTypeN))
-                .count();
-        BigDecimal averageRelevanceScore = stockNewsList.stream()
-                .map(StockNews::getRelevanceScore)
-                .filter(Objects::nonNull)
-                .reduce(BigDecimal.ZERO,BigDecimal::add); // (init, prev)
-        
-        long relevanceCount = stockNewsList.stream()
-                .map(StockNews::getRelevanceScore)
-                .filter(Objects::nonNull)
+        long newsCount = list.size();
+
+        long positivePrimaryCount = list.stream()
+                .filter(sn -> sn.getPrimaryType() == PrimaryType.P)
                 .count();
 
-        if (relevanceCount > 0) {
-            averageRelevanceScore = averageRelevanceScore.divide(
-                    BigDecimal.valueOf(relevanceCount),
-                    4,
-                    RoundingMode.HALF_UP
-            );
-        }
+        long negativePrimaryCount = list.stream()
+                .filter(sn -> sn.getPrimaryType() == PrimaryType.N)
+                .count();
+
+        BigDecimal sum = list.stream()
+                .map(StockNews::getRelevanceScore)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        long relevanceCount = list.stream()
+                .map(StockNews::getRelevanceScore)
+                .filter(Objects::nonNull)
+                .count();
+
+        BigDecimal averageRelevanceScore = relevanceCount > 0
+                ? sum.divide(BigDecimal.valueOf(relevanceCount), 4, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO;
+
+        Optional<StockNews> positivePrimary = list.stream()
+                .filter(sn -> sn.getPrimaryType() == PrimaryType.P)
+                .findFirst();
+
+        Optional<StockNews> negativePrimary = list.stream()
+                .filter(sn -> sn.getPrimaryType() == PrimaryType.N)
+                .findFirst();
 
         return new StockIssueRawDto(
                 stock.getStockId(),
@@ -90,22 +90,34 @@ public class IssueService {
                 newsCount,
                 positivePrimaryCount,
                 negativePrimaryCount,
-                averageRelevanceScore
+                averageRelevanceScore,
+                positivePrimary.map(sn -> sn.getNews().getTitle()).orElse(null),
+                positivePrimary.map(sn -> sn.getNews().getUrl()).orElse(null),
+                negativePrimary.map(sn -> sn.getNews().getTitle()).orElse(null),
+                negativePrimary.map(sn -> sn.getNews().getUrl()).orElse(null)
         );
     }
-    private TodayIssueResponseDto toResponseDto(StockIssueRawDto rawDto) {
+
+    /**
+     * 집계 DTO를 응답 DTO로 변환
+     */
+    private TodayIssueResponseDto toResponseDto(StockIssueRawDto raw) {
         return new TodayIssueResponseDto(
-                rawDto.stockId(),
-                rawDto.ticker(),
-                rawDto.stockName(),
-                rawDto.marketType(),
-                rawDto.currentPrice(),
-                rawDto.currency(),
-                rawDto.newsCount(),
-                rawDto.positivePrimaryCount(),
-                rawDto.negativePrimaryCount(),
-                rawDto.averageRelevanceScore(),
-                issueScoreCalculator.calculate(rawDto)
+                raw.stockId(),
+                raw.ticker(),
+                raw.stockName(),
+                raw.marketType(),
+                raw.currentPrice(),
+                raw.currency(),
+                raw.newsCount(),
+                raw.positivePrimaryCount(),
+                raw.negativePrimaryCount(),
+                raw.averageRelevanceScore(),
+                raw.positivePrimaryTitle(),
+                raw.positivePrimaryUrl(),
+                raw.negativePrimaryTitle(),
+                raw.negativePrimaryUrl(),
+                issueScoreCalculator.calculate(raw)
         );
     }
 }
