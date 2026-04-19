@@ -2,6 +2,7 @@ package com.konglab.issue.controller;
 
 import com.konglab.common.response.ApiErrorResponse;
 import com.konglab.common.response.ApiResponse;
+import com.konglab.issue.dto.IssueListResponseDto;
 import com.konglab.issue.dto.StockIssueSummaryDto;
 import com.konglab.issue.dto.TodayIssueResponseDto;
 import com.konglab.issue.service.IssueService;
@@ -32,12 +33,13 @@ public class IssueController {
      * GET /api/issues?date=2026-04-19
      */
     @GetMapping
-    public ApiResponse<List<TodayIssueResponseDto>> getIssueList(
+    public ApiResponse<IssueListResponseDto> getIssueList(
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(defaultValue = "0") Integer offset,
             @RequestParam(required = false) Integer limit
     ) {
-        return ApiResponse.success(issueService.getIssueList(date, limit));
+        return ApiResponse.success(issueService.getIssueList(date, offset, limit));
     }
 
     /**

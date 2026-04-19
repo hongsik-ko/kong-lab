@@ -5,6 +5,7 @@ import com.konglab.common.exception.BusinessException;
 import com.konglab.common.exception.ErrorCode;
 import com.konglab.exchange.service.ExchangeRateService;
 import com.konglab.issue.calculator.IssueScoreCalculator;
+import com.konglab.issue.dto.IssueListResponseDto;
 import com.konglab.issue.dto.StockIssueRawDto;
 import com.konglab.issue.dto.StockIssueSummaryDto;
 import com.konglab.issue.dto.TodayIssueResponseDto;
@@ -30,10 +31,12 @@ public class IssueService {
     private final IssueScoreCalculator issueScoreCalculator;
     private final ExchangeRateService exchangeRateService;
 
-    public List<TodayIssueResponseDto> getIssueList(LocalDate date, Integer limit) {
+    public IssueListResponseDto getIssueList(LocalDate date, Integer offset, Integer limit) {
+
+        validatePaging(offset, limit);
 
         if (limit != null && limit < 0) {
-            throw new BusinessException(ErrorCode.INVALID_LIMIT);
+            throw new BusinessException(ErrorCode.INVALID_INTEGER_PARAM);
         }
 
         LocalDate targetDate = (date != null)
@@ -55,11 +58,30 @@ public class IssueService {
                 .map(raw -> toResponseDto(raw, targetDate))
                 .sorted(Comparator.comparing(TodayIssueResponseDto::issueScore).reversed())
                 .toList();
-        if (limit != null && limit > 0 && limit < result.size()) {
-            return result.subList(0, limit);
+
+
+        int totalCount = result.size();
+        int safeOffset = Math.min(offset, totalCount);
+
+        boolean hasNext;
+        List<TodayIssueResponseDto> pagedItems;
+
+        if (limit == null) {
+            pagedItems = result.subList(safeOffset, totalCount);
+            hasNext = false;
+        } else {
+            int endIndex = Math.min(safeOffset + limit, totalCount);
+            pagedItems = result.subList(safeOffset, endIndex);
+            hasNext = endIndex < totalCount;
         }
 
-        return result;
+        return new IssueListResponseDto(
+                pagedItems,
+                totalCount,
+                safeOffset,
+                limit,
+                hasNext
+        );
     }
 
     public StockIssueSummaryDto getIssueSummary(Long stockId, LocalDate date) {
@@ -234,5 +256,18 @@ public class IssueService {
                                 )
                 )
                 .findFirst();
+    }
+
+    /**
+     * offset / limit 기본 검증
+     */
+    private void validatePaging(Integer offset, Integer limit) {
+        if (offset == null || offset < 0) {
+            throw new BusinessException(ErrorCode.INVALID_INTEGER_PARAM);
+        }
+
+        if (limit != null && limit <= 0) {
+            throw new BusinessException(ErrorCode.INVALID_INTEGER_PARAM);
+        }
     }
 }

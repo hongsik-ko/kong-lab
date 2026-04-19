@@ -17,7 +17,7 @@ public enum ErrorCode {
     // 공통
     COMMON_INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_001", "서버 오류가 발생했습니다."),
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "COMMON_002", "잘못된 요청입니다."),
-    INVALID_LIMIT(HttpStatus.BAD_REQUEST, "COMMON_003", "유효하지 않은 limit 값입니다."),
+    INVALID_INTEGER_PARAM(HttpStatus.BAD_REQUEST, "COMMON_003", "잘못된 정수 파라미터입니다."),
 
     // 도메인
     STOCK_NOT_FOUND(HttpStatus.NOT_FOUND, "STOCK_001", "존재하지 않는 종목입니다.");
