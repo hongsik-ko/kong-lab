@@ -33,10 +33,14 @@ public class DefaultIssueScoreCalculator implements IssueScoreCalculator{
 
         BigDecimal relevanceScore = rawData.averageRelevanceScore().multiply(new BigDecimal("5.0"));
 
+        BigDecimal timeScore = rawData.timeWeightedScore()
+                .multiply(new BigDecimal("2.0"));
+
         return newsScore
                 .add(positiveBonus)
                 .add(negativeBonus)
                 .add(relevanceScore)
+                .add(timeScore)
                 .setScale(2, RoundingMode.HALF_UP);
     }
 }
