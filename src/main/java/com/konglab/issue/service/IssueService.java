@@ -13,6 +13,7 @@ import com.konglab.stock.entity.Stock;
 import com.konglab.stocknews.entity.StockNews;
 import com.konglab.stocknews.repository.StockNewsRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -31,6 +32,10 @@ public class IssueService {
     private final IssueScoreCalculator issueScoreCalculator;
     private final ExchangeRateService exchangeRateService;
 
+//    @Cacheable(
+//            value = "issueList",
+//            key = "(#date == null ? 'today' : #date) + '-' + #offset + '-' + #limit"
+//    )
     public IssueListResponseDto getIssueList(LocalDate date, Integer offset, Integer limit) {
 
         validatePaging(offset, limit);
@@ -84,6 +89,10 @@ public class IssueService {
         );
     }
 
+/*    @Cacheable(
+            value = "issueSummary",
+            key = "#stockId + '-' + (#date == null ? 'today' : #date)"
+    )*/
     public StockIssueSummaryDto getIssueSummary(Long stockId, LocalDate date) {
         LocalDate targetDate = (date != null)
                 ? date

@@ -2,6 +2,7 @@ package com.konglab.news.dto;
 
 import com.konglab.stocknews.entity.StockNews;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -18,7 +19,7 @@ public record StockNewsResponseDto (
         LocalDateTime publishedAt,
         String sentiment,
         BigDecimal relevanceScore,
-        String primaryType) {
+        String primaryType) implements Serializable {
     public static StockNewsResponseDto from(StockNews stockNews) {
         return new StockNewsResponseDto(
                 stockNews.getNews().getNewsId(),

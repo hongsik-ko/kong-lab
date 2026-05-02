@@ -1,5 +1,6 @@
 package com.konglab.issue.dto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /*
@@ -29,5 +30,5 @@ public record TodayIssueResponseDto(
 
         BigDecimal timeWeightedScore, // 시간 가중치
         BigDecimal issueScore // 이슈 점수
-) {
+) implements Serializable {
 }

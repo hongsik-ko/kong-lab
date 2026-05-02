@@ -2,6 +2,7 @@ package com.konglab.issue.dto;
 
 import com.konglab.news.dto.StockNewsResponseDto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /*
@@ -30,7 +31,7 @@ public record StockIssueRawDto(
 
         BigDecimal timeWeightedScore // 전체 시간 가중치
 
-) {
+) implements Serializable {
 
 
 }

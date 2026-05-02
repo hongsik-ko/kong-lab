@@ -1,5 +1,6 @@
 package com.konglab;
 
+import jakarta.persistence.Cacheable;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -16,6 +17,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
  */
 @SpringBootApplication
 @EnableJpaAuditing
+/*@Cacheable*/
 public class KonglabApplication {
 
     public static void main(String[] args) {

@@ -35,6 +35,7 @@ public class DataInitializer {
      */
     @PostConstruct // 빈 생성 후 자동 실행
     public void init() {
+        System.out.println("### Custom redis Cache Initializing...");
         initStock();
         initExchangeRate();
         initNewsAndMapping();

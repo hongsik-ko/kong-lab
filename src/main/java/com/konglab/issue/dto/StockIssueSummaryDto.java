@@ -1,5 +1,6 @@
 package com.konglab.issue.dto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 
@@ -25,5 +26,5 @@ public record StockIssueSummaryDto (
         String negativePrimaryUrl, // 부정 대표 뉴스 URL
 
         BigDecimal issueScore // 이슈 점수
-) {
+) implements Serializable {
 }

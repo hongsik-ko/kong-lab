@@ -1,9 +1,12 @@
 package com.konglab.common.exception;
 
 import com.konglab.common.response.ApiErrorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.logging.ErrorManager;
 
 /**
  * 전역 예외 처리 핸들러
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * - 컨트롤러에서 발생한 예외를 여기서 공통 처리
  * - 모든 API의 에러 응답 형식을 통일
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     /**
@@ -36,6 +40,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleException(Exception e) {
+
+        log.error("Unexpected exception occurred: {}", e.getMessage(), e);
 
         ErrorCode errorCode = ErrorCode.COMMON_INTERNAL_ERROR;
 
