@@ -32,10 +32,10 @@ public class IssueService {
     private final IssueScoreCalculator issueScoreCalculator;
     private final ExchangeRateService exchangeRateService;
 
-//    @Cacheable(
-//            value = "issueList",
-//            key = "(#date == null ? 'today' : #date) + '-' + #offset + '-' + #limit"
-//    )
+    @Cacheable(
+            value = "issueList",
+            key = "(#date == null ? 'today' : #date) + '-' + #offset + '-' + #limit"
+    )
     public IssueListResponseDto getIssueList(LocalDate date, Integer offset, Integer limit) {
 
         validatePaging(offset, limit);
@@ -89,10 +89,10 @@ public class IssueService {
         );
     }
 
-/*    @Cacheable(
+    @Cacheable(
             value = "issueSummary",
             key = "#stockId + '-' + (#date == null ? 'today' : #date)"
-    )*/
+    )
     public StockIssueSummaryDto getIssueSummary(Long stockId, LocalDate date) {
         LocalDate targetDate = (date != null)
                 ? date
