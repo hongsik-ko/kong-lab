@@ -1,6 +1,7 @@
 package com.konglab.issue.service;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
  * 이슈 관련 캐시 관리 서비스
  */
 @Service
+@Slf4j
 public class IssueCacheService {
 
     /**
@@ -16,6 +18,7 @@ public class IssueCacheService {
     @CacheEvict(value = "issueList", allEntries = true)
     public void evictIssueListCache() {
         // @CacheEvict 동작용 메서드
+        log.info("=========issueList 캐시 삭제========");
     }
 
     /**
@@ -24,13 +27,15 @@ public class IssueCacheService {
     @CacheEvict(value = "issueSummary", allEntries = true)
     public void evictIssueSummaryCache() {
         // @CacheEvict 동작용 메서드
+        log.info("=========issueSummary 캐시 삭제========");
     }
 
     /**
      * 이슈 관련 캐시 전체 삭제
      */
     @CacheEvict(value = {"issueList", "issueSummary"}, allEntries = true)
-    public void evictAllIssueCache() {
+    public void evitAll() {
         // @CacheEvict 동작용 메서드
+        log.info("=========모든 캐시 삭제========");
     }
 }

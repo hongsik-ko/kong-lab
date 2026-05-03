@@ -1,5 +1,7 @@
 package com.konglab.issue.dto;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 

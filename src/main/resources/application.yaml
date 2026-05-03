@@ -24,7 +24,7 @@ spring:
       port: 6379
 
   cache:
-    type: none
+    type: redis
 
 logging:
   level:

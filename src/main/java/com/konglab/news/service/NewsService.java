@@ -3,8 +3,11 @@ package com.konglab.news.service;
 import com.konglab.common.entity.PrimaryType;
 import com.konglab.common.exception.BusinessException;
 import com.konglab.common.exception.ErrorCode;
+import com.konglab.issue.service.IssueCacheService;
 import com.konglab.news.dto.NewsSortType;
 import com.konglab.news.dto.StockNewsResponseDto;
+import com.konglab.news.entity.News;
+import com.konglab.news.repository.NewsRepository;
 import com.konglab.stocknews.entity.StockNews;
 import com.konglab.stocknews.repository.StockNewsRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,8 @@ import java.util.stream.Collectors;
 public class NewsService {
 
     private final StockNewsRepository stockNewsRepository;
+    private final IssueCacheService issueCacheService;;
+    private final NewsRepository newsRepository;
 
     /**
      * 종목별 뉴스 조회
@@ -46,6 +51,12 @@ public class NewsService {
                 .map(StockNewsResponseDto::from)
                 .toList();
     }
+
+    public void saveNews(News news) {
+        newsRepository.save(news);
+        issueCacheService.evitAll();
+    }
+
     private List<StockNews> applySorting(List<StockNews> list, NewsSortType sort) {
 
         return NewsSortType.LATEST.name().equals(sort.name())
