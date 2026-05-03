@@ -1,6 +1,7 @@
 package com.konglab.issue.controller;
 
 import com.konglab.common.response.ApiResponse;
+import com.konglab.issue.dto.IssueSnapshotCompareResponseDto;
 import com.konglab.issue.dto.IssueSnapshotResponseDto;
 import com.konglab.issue.service.IssueSnapshotService;
 import lombok.RequiredArgsConstructor;
@@ -51,5 +52,24 @@ public class IssueSnapshotController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
         return ApiResponse.success(issueSnapshotService.getSnapshotList(date));
+    }
+
+    /**
+     * 날짜별 이슈 랭킹 비교
+     *
+     * 예:
+     * GET /api/issue-snapshots/compare?baseDate=2026-05-03&compareDate=2026-05-02
+     */
+    @GetMapping("/compare")
+    public ApiResponse<List<IssueSnapshotCompareResponseDto>> compareSnapshot(
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate baseDate,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate compareDate
+    ) {
+        return ApiResponse.success(
+                issueSnapshotService.compareSnapshot(baseDate, compareDate)
+        );
     }
 }

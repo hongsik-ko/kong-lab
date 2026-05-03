@@ -2,9 +2,7 @@ package com.konglab.issue.service;
 
 import com.konglab.common.exception.BusinessException;
 import com.konglab.common.exception.ErrorCode;
-import com.konglab.issue.dto.IssueListResponseDto;
-import com.konglab.issue.dto.IssueSnapshotResponseDto;
-import com.konglab.issue.dto.TodayIssueResponseDto;
+import com.konglab.issue.dto.*;
 import com.konglab.issue.entity.IssueSnapshot;
 import com.konglab.issue.repository.IssueSnapshotRepository;
 import com.konglab.stock.entity.Stock;
@@ -16,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -123,5 +122,81 @@ public class IssueSnapshotService {
                 snapshot.getNegativePrimaryTitle(),
                 snapshot.getNegativePrimaryUrl()
         );
+    }
+
+    /**
+     * 날짜별 이슈 랭킹 비교
+     */
+    @Transactional(readOnly = true)
+    public List<IssueSnapshotCompareResponseDto> compareSnapshot(
+            LocalDate baseDate,
+            LocalDate compareDate
+    ) {
+
+        LocalDate today = baseDate != null
+                ? baseDate
+                : LocalDate.now(ZoneOffset.UTC);
+
+        LocalDate yesterday = compareDate != null
+                ? compareDate
+                : today.minusDays(1);
+
+        List<IssueSnapshot> currentList =
+                issueSnapshotRepository.findBySnapshotDateOrderByRankNoAsc(today);
+
+        List<IssueSnapshot> previousList =
+                issueSnapshotRepository.findBySnapshotDateOrderByRankNoAsc(yesterday);
+
+        if (currentList.isEmpty()) {
+            throw new BusinessException(ErrorCode.NO_ISSUE_FOUND);
+        }
+
+        Map<Long, IssueSnapshot> previousMap =
+                previousList.stream()
+                        .collect(Collectors.toMap(
+                                s -> s.getStock().getStockId(),
+                                s -> s
+                        ));
+
+        return currentList.stream()
+                .map(current -> {
+
+                    IssueSnapshot previous =
+                            previousMap.get(current.getStock().getStockId());
+
+                    Integer previousRank =
+                            previous != null ? previous.getRankNo() : null;
+
+                    Integer rankDiff =
+                            previousRank != null
+                                    ? previousRank - current.getRankNo()
+                                    : null;
+
+                    RankChangeType rankChangeType = makeRankChangeType(previous, rankDiff);
+
+                    return new IssueSnapshotCompareResponseDto(
+                            current.getStock().getStockId(),
+                            current.getStock().getTicker(),
+                            current.getStock().getName(),
+                            current.getRankNo(),
+                            previousRank,
+                            rankDiff,
+                            rankChangeType,
+                            current.getIssueScore()
+                    );
+                })
+                .toList();
+    }
+    private RankChangeType makeRankChangeType(IssueSnapshot previous, Integer rankDiff) {
+        // if (rankDiff == null) return null;
+
+        return previous == null
+                ? RankChangeType.NEW
+                : rankDiff > 0
+                  ? RankChangeType.UP
+                  : rankDiff < 0
+                    ? RankChangeType.DOWN
+                    : RankChangeType.SAME;
+
     }
 }
