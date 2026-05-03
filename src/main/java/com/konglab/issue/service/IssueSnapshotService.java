@@ -1,6 +1,9 @@
 package com.konglab.issue.service;
 
+import com.konglab.common.exception.BusinessException;
+import com.konglab.common.exception.ErrorCode;
 import com.konglab.issue.dto.IssueListResponseDto;
+import com.konglab.issue.dto.IssueSnapshotResponseDto;
 import com.konglab.issue.dto.TodayIssueResponseDto;
 import com.konglab.issue.entity.IssueSnapshot;
 import com.konglab.issue.repository.IssueSnapshotRepository;
@@ -13,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 이슈 스냅샷 서비스
@@ -27,6 +31,7 @@ public class IssueSnapshotService {
     private final IssueService issueService;
     private final IssueSnapshotRepository issueSnapshotRepository;
     private final StockRepository stockRepository;
+    private IssueSnapshot snapshot;
 
     /*
     * 특정 날짜 기준 이슈 결과를 스냅샷으로 저장
@@ -72,5 +77,51 @@ public class IssueSnapshotService {
 
         }
 
+    }
+    /**
+     * 특정 날짜의 이슈 스냅샷 목록 조회
+     */
+    @Transactional(readOnly = true)
+    public List<IssueSnapshotResponseDto> getSnapshotList(LocalDate snapshotDate) {
+
+        LocalDate targetDate = snapshotDate != null
+                ? snapshotDate
+                : LocalDate.now(ZoneOffset.UTC);
+
+        List<IssueSnapshot> snapshotList =
+                issueSnapshotRepository.findBySnapshotDateOrderByRankNoAsc(targetDate);
+
+        if (snapshotList.isEmpty()) {
+            throw new BusinessException(ErrorCode.NO_ISSUE_FOUND);
+        }
+
+        return snapshotList.stream()
+                .map(this::toResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * IssueSnapshot 엔티티를 응답 DTO로 변환
+     */
+    private IssueSnapshotResponseDto toResponseDto(IssueSnapshot snapshot) {
+        this.snapshot = snapshot;
+        return new IssueSnapshotResponseDto(
+                snapshot.getIssueSnapshotId(),
+                snapshot.getSnapshotDate(),
+                snapshot.getRankNo(),
+                snapshot.getStock().getStockId(),
+                snapshot.getStock().getTicker(),
+                snapshot.getStock().getName(),
+                snapshot.getIssueScore(),
+                snapshot.getNewsCount(),
+                snapshot.getPositivePrimaryCount(),
+                snapshot.getNegativePrimaryCount(),
+                snapshot.getAverageRelevanceScore(),
+                snapshot.getTimeWeightedScore(),
+                snapshot.getPositivePrimaryTitle(),
+                snapshot.getPositivePrimaryUrl(),
+                snapshot.getNegativePrimaryTitle(),
+                snapshot.getNegativePrimaryUrl()
+        );
     }
 }

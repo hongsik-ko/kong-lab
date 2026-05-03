@@ -1,15 +1,14 @@
 package com.konglab.issue.controller;
 
 import com.konglab.common.response.ApiResponse;
+import com.konglab.issue.dto.IssueSnapshotResponseDto;
 import com.konglab.issue.service.IssueSnapshotService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * 이슈 스냅샷 API 컨트롤러
@@ -38,5 +37,19 @@ public class IssueSnapshotController {
         this.date = date;
         issueSnapshotService.createSnapshot(date);
         return ApiResponse.success(null);
+    }
+
+    /**
+     * 특정 날짜 기준 이슈 스냅샷 조회
+     *
+     * 예:
+     * GET /api/issue-snapshots?date=2026-05-03
+     */
+    @GetMapping
+    public ApiResponse<List<IssueSnapshotResponseDto>> getSnapshotList(
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        return ApiResponse.success(issueSnapshotService.getSnapshotList(date));
     }
 }

@@ -20,7 +20,11 @@ public enum ErrorCode {
     INVALID_INTEGER_PARAM(HttpStatus.BAD_REQUEST, "COMMON_003", "잘못된 정수 파라미터입니다."),
 
     // 도메인
-    STOCK_NOT_FOUND(HttpStatus.NOT_FOUND, "STOCK_001", "존재하지 않는 종목입니다.");
+    STOCK_NOT_FOUND(HttpStatus.NOT_FOUND, "STOCK_001", "존재하지 않는 종목입니다."),
+    NO_ISSUE_FOUND(HttpStatus.NOT_FOUND, "ISSUE_001", "존재하지 않는 이슈 입니다.")
+    ;
+
+
 
     private final HttpStatus status;
     private final String code;
